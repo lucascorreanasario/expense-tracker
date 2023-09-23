@@ -1,51 +1,221 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <link rel="stylesheet" href="style.css" />
-    <title>Expense Tracker</title>
-  </head>
-  <body>
-    <h1>Expense Tracker</h1>
+<html lang="pt-br">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <link rel="stylesheet" href="style.css" />
+  <title>Registro de Gastos</title>
+</head>
+
+<body>
+  <div class="fundo">
+    <h1>Registro de Gastos</h1>
     <div class="container">
-      <h4>Your Balance</h4>
-      <h1 id="balance">$0.00</h1>
+      <h4>Seu Saldo</h4>
+      <h1 id="balance">R$ 0,00</h1>
 
       <div class="inc-exp-container">
         <div>
-          <h4>Income</h4>
-          <p id="money-plus" class="money plus">+$0.00</p>
+          <h4>Entrada</h4>
+          <p id="money-plus" class="money plus">+R$ 0,00</p>
         </div>
         <div>
-          <h4>Expense</h4>
-          <p id="money-minus" class="money minus">-$0.00</p>
+          <h4>Despesa</h4>
+          <p id="money-minus" class="money minus">-R$ 0,00</p>
         </div>
       </div>
 
-      <h3>History</h3>
-      <ul id="list" class="list">
-        <!--
-        <li class="minus">Cash <span>-$400</span><button class="delete-btn">x</button></li>
-        -->
-      </ul>
+      <button id="openModal" class="btn">Adicionar nova transação</button>
 
-      <h3>Add new transaction</h3>
-      <form id="form">
-        <div class="form-control">
-          <label for="text">Text</label>
-          <input type="text" id="text" placeholder="Enter text...">
+      <div id="transactionModal" class="modal">
+        <div class="modal-content">
+          <span id="closeModal" class="close">&times;</span>
+          <h3 >Adicionar nova transação</h3>
+          <form id="form">
+            <div class="form-control">
+              <label for="transaction-type">Tipo de Transação</label>
+              <select id="transaction-type">
+                <option value="income">Entrada</option>
+                <option value="expense">Despesa</option>
+              </select>
+            </div>
+            <div class="form-control">
+              <label for="text">Descrição</label>
+              <input type="text" id="text" placeholder="Digite o texto...">
+              <button type="button" id="recordAudio">Gravar Áudio</button>
+            </div>
+            <div class="form-control">
+              <label for="amount">Valor</label>
+              <input type="number" id="amount" placeholder="Digite o valor..." step="0.01">
+            </div>
+            <div class="form-control">
+              <label for="category">Categoria</label>
+              <select id="category">
+                <option value="Alimentação">Alimentação</option>
+                <option value="Transporte">Transporte</option>
+                <option value="Moradia">Moradia</option>
+                <option value="Saúde">Saúde</option>
+                <option value="Lazer/Entretenimento">Lazer/Entretenimento</option>
+                <option value="Educação">Educação</option>
+                <option value="Roupas e Acessórios">Roupas e Acessórios</option>
+                <option value="Dívidas/Pagamentos">Dívidas/Pagamentos</option>
+                <option value="Economias/Investimentos">Economias/Investimentos</option>
+                <option value="Outros">Outros</option>
+              </select>
+            </div>
+            <div class="form-control">
+              <label for="date">Data</label>
+              <input type="date" id="date">
+            </div>
+            <button class="btn">Adicionar transação</button>
+          </form>
         </div>
-        <div class="form-control">
-          <label for="amount">Amount <br> (negative - expense, positive - income)</label>
-          <input type="number" id="amount" placeholder="Enter amount...">
-        </div>
-        <button class="btn">Add transaction</button>
-      </form>
+
+        
+        </form>
+      </div>
     </div>
 
+    <h3>Histórico</h3>
+    <ul id="list" class="list"></ul>
+  </div>
+  </div>
 
-    <script src="script.js"></script>
-  </body>
+  <script src="./record.js"></script>
+  <script src="./app.js">
+
+  </script>
+</body>
+
+</html>
+
+
+
+<script>
+  function formatarNumero(valor) {
+    return valor.toLocaleString('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    });
+  }
+
+  const saldo = document.getElementById('balance');
+  const dinheiroMais = document.getElementById('money-plus');
+  const dinheiroMenos = document.getElementById('money-minus');
+  const lista = document.getElementById('list');
+  const formulario = document.getElementById('form');
+  const texto = document.getElementById('text');
+  const valor = document.getElementById('amount');
+  const categoria = document.getElementById('category');
+  const dataTransacao = document.getElementById('date');
+  const modal = document.getElementById('transactionModal');
+  const openModalBtn = document.getElementById('openModal');
+  const closeModalBtn = document.getElementById('closeModal');
+
+
+  openModalBtn.addEventListener('click', function () {
+    modal.style.display = "block";
+  });
+
+  closeModalBtn.addEventListener('click', function () {
+    modal.style.display = "none";
+  });
+
+  window.addEventListener('click', function (event) {
+    if (event.target === modal) {
+      modal.style.display = "none";
+    }
+  });
+
+
+  // Set the default value of the date input to the current date
+  const today = new Date();
+  const formattedDate = today.toISOString().split('T')[0];
+  dataTransacao.value = formattedDate;
+
+  const transacoesLocalStorage = JSON.parse(localStorage.getItem('transactions'));
+  let transacoes = localStorage.getItem('transactions') !== null ? transacoesLocalStorage : [];
+
+  function adicionarTransacao(e) {
+    e.preventDefault();
+
+    const tipoTransacao = document.getElementById('transaction-type').value;
+    const valorTransacao = tipoTransacao === 'expense' ? -Math.abs(+valor.value) : Math.abs(+valor.value);
+
+    if (texto.value.trim() === '' || valor.value.trim() === '') {
+      alert('Por favor, adicione um texto e um valor');
+    } else {
+      const transacao = {
+        id: gerarID(),
+        texto: texto.value,
+        valor: valorTransacao,
+        categoria: categoria.value,
+        data: dataTransacao.value
+      };
+
+      transacoes.push(transacao);
+      adicionarTransacaoDOM(transacao);
+      atualizarValores();
+      atualizarArmazenamentoLocal();
+
+      texto.value = '';
+      valor.value = '';
+      categoria.value = 'Alimentação'; // Reset to default category
+      dataTransacao.value = formattedDate; // Reset to current date
+    }
+  }
+
+  function gerarID() {
+    return Math.floor(Math.random() * 100000000);
+  }
+
+  function adicionarTransacaoDOM(transacao) {
+  const sinal = transacao.valor < 0 ? '-' : '+';
+  const item = document.createElement('li');
+  item.classList.add(transacao.valor < 0 ? 'minus' : 'plus');
+
+  item.innerHTML = `
+    ${transacao.data} - ${transacao.texto} (${transacao.categoria}) 
+    <span>${sinal} ${formatarNumero(Math.abs(transacao.valor))}</span> 
+    <button onclick="removerTransacao(${transacao.id})" class="delete-btn">X</button>
+  `;
+
+  lista.appendChild(item);
+}
+
+
+  function atualizarValores() {
+    const valores = transacoes.map(transacao => transacao.valor);
+    const total = valores.reduce((acc, item) => (acc += item), 0);
+    const renda = valores.filter(item => item > 0).reduce((acc, item) => (acc += item), 0);
+    const despesa = valores.filter(item => item < 0).reduce((acc, item) => (acc += item), 0) * -1;
+
+    saldo.innerText = formatarNumero(total);
+    dinheiroMais.innerText = formatarNumero(renda);
+    dinheiroMenos.innerText = formatarNumero(despesa);
+  }
+
+  function removerTransacao(id) {
+    transacoes = transacoes.filter(transacao => transacao.id !== id);
+    atualizarArmazenamentoLocal();
+    inicializar();
+  }
+
+  function atualizarArmazenamentoLocal() {
+    localStorage.setItem('transactions', JSON.stringify(transacoes));
+  }
+
+  function inicializar() {
+    lista.innerHTML = '';
+    transacoes.forEach(adicionarTransacaoDOM);
+    atualizarValores();
+  }
+
+  inicializar();
+  formulario.addEventListener('submit', adicionarTransacao);
+</script>
+</body>
+
 </html>

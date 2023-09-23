@@ -18,11 +18,71 @@ body {
   min-height: 100vh;
   margin: 0;
   font-family: 'Noto Sans', sans-serif;
+  background: #FFFFFF url("img/lion.jpg");
+  background-size: cover;
+
+}
+
+.fundo {
+  background-color: #00000075; 
+  padding: 40px;
+  border-radius: 8px; 
+  width: 100%; 
+  max-width: 600px; 
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+}
+
+.form-control input[type="date"] {
+  font-size: 16px;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.form-control input[type="date"]:focus {
+  border-color: #4CAF50;
+  outline: none;
+}
+
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.7);
+  overflow: auto;
+}
+
+.modal-content {
+  background-color: #0000007d;
+  margin: 15% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 70%;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+  cursor: pointer;
 }
 
 .container {
   margin: 30px auto;
-  width: 40vw;
+  width: 100%;
 }
 
 @media screen and (max-width: 760px) {
@@ -30,6 +90,20 @@ body {
     width: 90vw;
   }
 }
+
+.input-icon-wrapper {
+  position: relative;
+}
+
+.microphone-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+
 
 h1 {
   font-weight: 700;
@@ -110,7 +184,7 @@ input[type='text'], input[type='number'] {
   border-radius: 3px;
   display: block;
   font-size: 18px;
-  margin: 10px 0 30px;
+  margin: 40px 0 30px;
   padding: 10px;
   width: 100%;
 }
@@ -126,15 +200,22 @@ input[type='text'], input[type='number'] {
 }
 
 .list li {
-  background-color: #fff;
   box-shadow: var(--box-shadow);
-  border-radius: 2px;
-  color: #333;
-  display: flex;
-  justify-content: space-between;
-  position: relative;
-  padding: 10px;
   margin: 10px 0;
+  word-wrap: break-word;
+  margin-bottom: 10px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+  color: #121212;
+  display: flex;         
+  align-items: center;   
+  justify-content: space-between;
+}
+
+.list li span{
+  width: 200px;
 }
 
 .list li.plus {
@@ -146,20 +227,17 @@ input[type='text'], input[type='number'] {
 }
 
 .delete-btn {
-  cursor: pointer;
-  background-color: #e74c3c;
-  border: 0;
-  color: #fff;
-  font-size: 20px;
-  line-height: 20px;
-  padding: 2px 5px;
-  position: absolute;
-  top: 50%;
-  left: 0;
-  transform: translate(-100%, -50%);
-  opacity: 0;
-  transition: opacity 0.3s ease;
+  background: red;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  padding: 5px 10px;
+  margin-left: 10px;
+  cursor: pointer;   
+  
+
 }
+
 
 .list li:hover .delete-btn {
   opacity: 1;

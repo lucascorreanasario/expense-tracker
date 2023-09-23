@@ -1,129 +1,127 @@
-const balance = document.getElementById('balance');
-const money_plus = document.getElementById('money-plus');
-const money_minus = document.getElementById('money-minus');
-const list = document.getElementById('list');
-const form = document.getElementById('form');
-const text = document.getElementById('text');
-const amount = document.getElementById('amount');
+const saldo = document.getElementById('balance');
+const dinheiroMais = document.getElementById('money-plus');
+const dinheiroMenos = document.getElementById('money-minus');
+const lista = document.getElementById('list');
+const formulario = document.getElementById('form');
+const texto = document.getElementById('text');
+const valor = document.getElementById('amount');
 
-// const dummyTransactions = [
-  //{
-  //  id: 1,
-  //  text: 'Snacks',
-  //  amount: -20
-  //},
-  //{
-  //  id: 2,
-  //  text: 'Income',
-  //  amount: 300
-  //},
-  //{
-  //  id: 3,
-   // text: 'Gear',
-   // amount: -75
-  //},
-  //{
-  //  id: 4,
-  //  text: 'Gift',
-  //  amount: 50
-  //}
-//];
+const modal = document.getElementById('transactionModal');
+const openModalBtn = document.getElementById('openModal');
+const closeModalBtn = document.getElementById('closeModal');
 
-const localStorageTransactions = JSON.parse(localStorage.getItem('transactions'));
+openModalBtn.addEventListener('click', function() {
+    modal.style.display = "block";
+});
 
-let transactions = localStorage.getItem('transactions') !== null ? localStorageTransactions : [];
+closeModalBtn.addEventListener('click', function() {
+    modal.style.display = "none";
+});
 
-// Add transaction
-function addTransaction(e) {
+window.addEventListener('click', function(event) {
+    if (event.target === modal) {
+        modal.style.display = "none";
+    }
+});
+
+//modal
+
+
+const transacoesLocalStorage = JSON.parse(localStorage.getItem('transactions'));
+
+let transacoes = localStorage.getItem('transactions') !== null ? transacoesLocalStorage : [];
+
+// Adicionar transação
+function adicionarTransacao(e) {
   e.preventDefault();
 
-  if(text.value.trim() === '' || amount.value.trim() === '') {
-    alert('Please add a text and amount');
+  if(texto.value.trim() === '' || valor.value.trim() === '') {
+    alert('Por favor, adicione um texto e um valor');
   } else {
-    const transaction = {
-      id: generateID(),
-      text: text.value,
-      amount: +amount.value
+    const transacao = {
+      id: gerarID(),
+      texto: texto.value,
+      valor: +valor.value
     };
 
-    transactions.push(transaction);
+    transacoes.push(transacao);
 
-    addTransactionDOM(transaction);
+    adicionarTransacaoDOM(transacao);
 
-    updateValues();
+    atualizarValores();
 
-    updateLocalStorage();
+    atualizarArmazenamentoLocal();
 
-    text.value='';
-    amount.value = '';
+    texto.value='';
+    valor.value = '';
   }
 }
 
-// Generate random ID
-function generateID() {
+// Gerar ID aleatório
+function gerarID() {
   return Math.floor(Math.random() * 100000000);
 }
 
-// Add transactions to DOM list
-function addTransactionDOM(transaction) {
-  // Get sign
-  const sign = transaction.amount < 0 ? '-' : '+';
+// Adicionar transações à lista DOM
+function adicionarTransacaoDOM(transacao) {
+  // Obter sinal
+  const sinal = transacao.valor < 0 ? '-' : '+';
 
   const item = document.createElement('li');
 
-  // Add class based on value
-  item.classList.add(transaction.amount < 0 ? 'minus' : 'plus');
+  // Adicionar classe com base no valor
+  item.classList.add(transacao.valor < 0 ? 'minus' : 'plus');
 
   item.innerHTML = `
-    ${transaction.text} <span>${sign}${Math.abs(transaction.amount)}</span> <button class="delete-btn" onclick="removeTransaction(${transaction.id})">x</button>
+    ${transacao.texto} <span>${sinal}${Math.abs(transacao.valor)}</span> <button class="delete-btn" onclick="removerTransacao(${transacao.id})">x</button>
   `;
 
-  list.appendChild(item);
+  lista.appendChild(item);
 }
 
-// Update the balance, income and expense
-function updateValues() {
-  const amounts = transactions.map(transaction => transaction.amount);
+// Atualizar o saldo, renda e despesa
+function atualizarValores() {
+  const valores = transacoes.map(transacao => transacao.valor);
 
-  const total = amounts.reduce((acc, item) => (acc += item), 0).toFixed(2);
+  const total = valores.reduce((acc, item) => (acc += item), 0).toFixed(2);
 
-  const income = amounts
+  const renda = valores
     .filter(item => item > 0)
     .reduce((acc, item) => (acc += item), 0)
     .toFixed(2);
 
-  const expense = (amounts
+  const despesa = (valores
     .filter(item => item < 0)
     .reduce((acc, item) =>(acc += item), 0) * -1)
     .toFixed(2);
 
-  balance.innerText = `$${total}`;
-  money_plus.innerText = `$${income}`;
-  money_minus.innerText = `$${expense}`;
+  saldo.innerText = `R$${total}`;
+  dinheiroMais.innerText = `R$${renda}`;
+  dinheiroMenos.innerText = `R$${despesa}`;
 }
 
-// Remove transaction by ID
-function removeTransaction(id) {
-  transactions = transactions.filter(transaction => transaction.id !== id);
+// Remover transação por ID
+function removerTransacao(id) {
+  transacoes = transacoes.filter(transacao => transacao.id !== id);
 
-  updateLocalStorage();
+  atualizarArmazenamentoLocal();
 
-  init();
+  inicializar();
 }
 
-// Update local storage transactions
-function updateLocalStorage() {
-  localStorage.setItem('transactions', JSON.stringify(transactions));
+// Atualizar transações no armazenamento local
+function atualizarArmazenamentoLocal() {
+  localStorage.setItem('transactions', JSON.stringify(transacoes));
 }
 
-// Init app
-function init() {
-  list.innerHTML = '';
+// Inicializar aplicativo
+function inicializar() {
+  lista.innerHTML = '';
 
-  transactions.forEach(addTransactionDOM);
-  updateValues();
+  transacoes.forEach(adicionarTransacaoDOM);
+  atualizarValores();
 }
 
-init();
+inicializar();
 
-form.addEventListener('submit', addTransaction);
+formulario.addEventListener('submit', adicionarTransacao);
